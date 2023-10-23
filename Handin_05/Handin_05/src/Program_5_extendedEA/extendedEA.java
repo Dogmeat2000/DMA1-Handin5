@@ -12,6 +12,36 @@ public class extendedEA
 
     // Implement your method here
 
+    //Start by checking if GCD is equal to 1. If not, we simply return 0. However, I think returning null would be better, if the proper error/exception handling had been set up.
+    if((GCD.findGCD(a,b)) != 1)
+    {
+      return new int[]{0,0};
+    }
+
+    //We now know that there must be an inverse. So we begin the algorithm calculations.
+    //ax + by  =  gcd(a, b) or in other terms. Find the inverse of a mod b.
+    //For this I expect the GCD method to be looping within itself until we have finished working through the entire extended euclidean algorithm.
+    //Lets initialize a few variables to easier keep track of what is what:
+    int iOriginal_a = a;
+    int iOriginal_b = b;
+    int iFirst_x = 0;
+    int iFirst_y = 0;
+
+    //Run GCD Algorithm to find the initial values of x and y.
+    //GCD(a,b) = gcd(a, rem(b,a))
+    //Example: GCD(102, 53) = GCD(53, rem(102, 53) = GCD(53, 49) -> Expressed with Bezout's theorem as: 49 = 1 * 102 - 1 * 53
+    if(a - a%b >= 0)
+    {
+      iFirst_y = a % b; //102 % 53 = rem(102, 53)
+    }
+
+    iFirst_y = a % b; //102 % 53 = rem(102, 53)
+    iFirst_x = a;
+    System.out.println("first x = " + iFirst_x + " | first y = " + iFirst_y);
+
+
+
+
       return new int[]{42,42};
   }
 
