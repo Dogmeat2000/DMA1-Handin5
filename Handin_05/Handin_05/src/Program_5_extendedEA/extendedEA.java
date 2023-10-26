@@ -26,7 +26,6 @@ public class extendedEA
     //If b is zero, it means that this is the last iteration of this EEA call:
     if (b == 0)
     {
-      //we also overload our return value here with the remaining 3 values (a, x and y) so that we might push these upward in our nested iteration stack.
       //we know that x must be 1 if b is zero, since this also means that y is zero. We also know that a must equal the GCD, which we also know must be 1 at the lowest level.
       return new int[] {1, 0};
     }
@@ -34,7 +33,7 @@ public class extendedEA
     //Since we are not allowed to pass x and y values downward, we will instead need to find the bottom values and work our way upward in a recursive manner.
     //So at this point we simply call the next iteration of this EEA method, using the values we know will be a and b one level down:
     int[] downwardRecurringIterationResult = EAA(b, (a % b));
-    /**Let us use this calculcation example for the remainder of this method, to illustrate what actually happens at each step:
+    /**Let us use this calculation example for the remainder of this method, to illustrate what actually happens at each step:
      * We use this case as the example: EEA(102,53) -> We want to find 102 mod 53.
        * 1st iteration: Value of downwardRecurringIterationResults is EEA(53, (102 % 53)) = EEA(53,49)
        * 2nd iteration: Value of downwardRecurringIterationResults is EEA(49, (53 % 49)) = EEA(49,4)
@@ -44,7 +43,7 @@ public class extendedEA
      *
      * At the 4th iteration the nested calls begin working their way up the recursive ladder. We get these return values:
        * 4th iteration returns [x=1, y=0]
-       * 3rd iteration proceeds with the below code, using x=1 and y=0.*/
+       * 3rd iteration proceeds with the below code, using x4=1 and y4=0.*/
 
     //Since we have reached this line in the code, it means we are now working our way back upwards in our backward recurring sequence.
 
@@ -55,7 +54,7 @@ public class extendedEA
 
     //Going back upwards to the next EEA iteration we know that:
     /** Here we utilize the knowledge we have from how the EEA recursive algorithm works.
-     * We know that by in the current iteration becomes ax in the next.
+     * We know that b*y in the current iteration becomes a*x in the next.
         * Example:
         * 0th iteration: a*x + b*y = 1
         * 1st iteration: a1*x1 + b1*y1 = 1
@@ -64,7 +63,7 @@ public class extendedEA
         * Thus we can express this relationship between the 4th and 3rd iteration:
 
         * 4th iteration returns [x4=1, y4=0], a4=1 and b4=0.
-        *
+
         * In order to express the x and y values for the current iteration we work our known values a bit:
         * a3*x3 + b3*y3 = a4*x4 + b4*y4
         * a3*x3 + b3*y3 = b3*x4 + (a3 % b3)*y4
@@ -84,7 +83,6 @@ public class extendedEA
 
     //We have now calculated the current iterations x and y values, and can return these upward to the next recursive call, until we reach the initial call.
     return new int[] {x_CurrentIteration, y_CurrentIteration};
-
 
   }
 
