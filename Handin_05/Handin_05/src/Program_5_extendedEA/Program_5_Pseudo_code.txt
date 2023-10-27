@@ -1,3 +1,63 @@
 This file contains the pseudo-code for Program 5 in DMA1 Handin nr. 5
 Written by K. Dashnaw
 
+First step will be to determine whether or not there exists an inverse. For this the greatest common divisor (GCD) for the input positive integers must equal 1,
+since both values must be either primes or relative primes to each other.
+
+  if(GCD(a,b) NOT equal to 1)
+  {
+    break operation and return a zero value. (Since zero can never be a divisor).
+  }
+
+We now know that there must be a multiplicative inverse. So we begin the algorithm calculations.
+ax + by (Bezout's theorem)  is equal to  gcd(a, b) or in other terms: Find the inverse of a mod b.
+
+First we need to assign the user input to proper variables.
+(
+  Assign user input integers to variable a and variable b.
+  declare variables x and y. (but don't assign them yet)
+
+  Don't check for illegal inputs or anything. Simply assume proper positive integers are entered.
+)
+
+Now we must express our initial x and y values as they are connected to the a and b values.
+For this we need to determine whether a subtraction or addition is proper.
+Example: GCD(102, 53) = GCD(53, rem(102, 53) = GCD(53, 49) -> Expressed with Bezout's theorem as: 49 = 1 * 102 - 1 * 53
+
+if(a > b)
+{
+ subtraction operation.
+ while(rem(a,b) not equal to x*a minus y*b
+
+ a%b != a*x - b*y)
+ {
+
+
+ }
+
+
+}
+else
+{
+  addition operation
+}
+
+
+
+
+
+    //Lets initialize a few variables to easier keep track of what is what:
+    int iFirst_x = 0;
+    int iFirst_y = 0;
+
+    //Run GCD Algorithm to find the initial values of x and y.
+    //GCD(a,b) = gcd(a, rem(b,a))
+
+    if(a - a%b >= 0)
+    {
+      iFirst_y = a % b; //102 % 53 = rem(102, 53)
+    }
+
+    iFirst_y = a % b; //102 % 53 = rem(102, 53)
+    iFirst_x = a;
+    System.out.println("first x = " + iFirst_x + " | first y = " + iFirst_y);
