@@ -24,15 +24,22 @@ public class extendedEA
 
     //Next we need to check if the b value is zero. As once we have iterated our way to the end of the EEA algorithm the b value should be zero for the gcd to return 1.
     //If b is zero, it means that this is the last iteration of this EEA call:
-    if (b == 0)
+    int[] downwardRecurringIterationResult;
+
+    /**[Note: For the time analysis we only look at the more complex factor of a and b.This being b, which we equate with n for time analysis]*/
+    if (b == 0) /** [1 time unit (base case), 1 from == ]*/
     {
       //we know that x must be 1 if b is zero, since this also means that y is zero. We also know that a must equal the GCD, which we also know must be 1 at the lowest level.
-      return new int[] {1, 0};
+      return new int[] {1, 0}; /** [1 time unit (base case), 1 from return ]*/
+    }
+    else
+    {
+      //Since we are not allowed to pass x and y values downward, we will instead need to find the bottom values and work our way upward in a recursive manner.
+      //So at this point we simply call the next iteration of this EEA method, using the values we know will be a and b one level down:
+
+      downwardRecurringIterationResult = EAA(b, (a % b)); /** [3 time unit (recursive case),1 from recursive call, 1 from = and 1 from % ----> This is T(n)=1+1*T(n) ]*/
     }
 
-    //Since we are not allowed to pass x and y values downward, we will instead need to find the bottom values and work our way upward in a recursive manner.
-    //So at this point we simply call the next iteration of this EEA method, using the values we know will be a and b one level down:
-    int[] downwardRecurringIterationResult = EAA(b, (a % b));
     /**Let us use this calculation example for the remainder of this method, to illustrate what actually happens at each step:
      * We use this case as the example: EEA(102,53) -> We want to find 102 mod 53.
        * 1st iteration: Value of downwardRecurringIterationResults is EEA(53, (102 % 53)) = EEA(53,49)
@@ -49,8 +56,8 @@ public class extendedEA
 
     //We now declare and initialize the relevant values for this iterations calculations:
     //We extract our x and y values from our downward recurring iteration.
-    int x_PriorIteration = downwardRecurringIterationResult[0];
-    int y_PriorIteration = downwardRecurringIterationResult[1];
+    int x_PriorIteration = downwardRecurringIterationResult[0]; /** [1 time unit (recursive case), 1 from = ]*/
+    int y_PriorIteration = downwardRecurringIterationResult[1]; /** [1 time unit (recursive case), 1 from = ]*/
 
     //Going back upwards to the next EEA iteration we know that:
     /** Here we utilize the knowledge we have from how the EEA recursive algorithm works.
@@ -71,18 +78,31 @@ public class extendedEA
         * a3*x3 + b3*y3 = b3*x4 + a3*y4 - b3*(a3-(a3|b3)*y4
         * a3*x3 + b3*y3 = a3*y4 + b3*x4 - b3*(a3-(a3|b3)*y4
         * a3*x3 + b3*y3 = a3*y4 + b3*(x4 - (a3|b3)*y4)
-        * Comparing the above coefficents using bezouts theorem we see that for a3, x3 = y4
+        * Comparing the above coefficents using bezouts theorem we see that for a3, both x3 and y4 are coefficients, and these are equal to each other.
           * thus x3 = y4 (or x_current will equal y_prior_iteration)
 
-        * we also see for b3 that y3 = (x4-(a3|b3)*y4)
+        * we also see for b3 that the coefficients are either y3 or (x4-(a3|b3)*y4), and that these also both are equal each other.
           * thus y_current = (x_prior_iteration - (a_current|b_current)*y_prior_iteration)
      * */
 
-    int x_CurrentIteration = y_PriorIteration;
-    int y_CurrentIteration = x_PriorIteration - (a / b) * y_PriorIteration; //The division operation ignores decimal results since it is working on integers. This is intentional here, since we want the divisor without remainder.
+    int x_CurrentIteration = y_PriorIteration; /** [1 time unit (recursive case), 1 from = ]*/
+    int y_CurrentIteration = x_PriorIteration - (a / b) * y_PriorIteration; /** [4 time units (recursive case), 1 from =, 1 from -, 1 from / and 1 from * ]*/
+    //The division operation ignores decimal results since it is working on integers. This is intentional here, since we want the divisor without remainder.
 
     //We have now calculated the current iterations x and y values, and can return these upward to the next recursive call, until we reach the initial call.
     return new int[] {x_CurrentIteration, y_CurrentIteration};
+
+      /** Time Complexity Analysis / Algorithm Analysis:
+       * Please refer to documentation marked in the code that are encapsulated with [ ] for the relevant parts relating to the time analysis.
+       * For this analysis we assume n to be equal to b, since the recurring relationship only ends once b == 0.
+       * We choose to use a the case where both the entered integers are either primes or relative primes to each other, as this will be the cases that cause the most recursions / consume the most time.
+       * Base case = T(0) = 2           <--- When b=n=0, only 2 time units are spent.
+       * T(n) = 1 + 1*T(n) + 1 + 1 + 1 + 4
+       * Now we figure out a way to write T(n) as an explicit function of n:
+       * T(n) = n + 6
+       * Now we convert this to Big-Oh by ignoring the constants:
+       * T(n) = O(n)
+      */
 
   }
 
