@@ -16,78 +16,79 @@ public class extendedEA
     // Implement your method here
 
     /** I commented this part out, since I was failing the pre-built tests. Basically my intention here is to catch when no inverse exists instead of performing the calculation. However I have decided to comment this out for now.*/
-    //Start by checking if GCD is equal to 1. If not, we simply return 0. However, I think returning null would be better, if the proper error/exception handling had been set up.
+    //Start by checking if GCD is equal to '1'. If not, we simply return '0'. However, I think returning 'null' would be better, if the proper error/exception handling had been set up.
     /*if ((GCD.findGCD(a, b)) != 1)
     {
       return new int[] {0, 0};
     }*/
 
-    //Next we need to check if the b value is zero. As once we have iterated our way to the end of the EEA algorithm the b value should be zero for the gcd to return 1.
-    //If b is zero, it means that this is the last iteration of this EEA call:
-    int[] downwardRecurringIterationResult;
+    //Declare the variables we will be using below:
+    int[] downwardRecurringIterationResult; /* [0 time units.]*/
+    int x_CurrentIteration; /* [0 time units.]*/
+    int y_CurrentIteration; /* [0 time units.]*/
 
-    /**[Note: For the time analysis we only look at the more complex factor of a and b.This being b, which we equate with n for time analysis]*/
-    if (b == 0) /** [1 time unit (base case), 1 from == ]*/
+    //Next we need to check if the 'b' value is zero. Since once, we have iterated our way to the end of the EEA algorithm the 'b' value should be zero for the gcd to return '1'.
+    //If 'b' is zero, it means that this is the last iteration of this EEA call:
+
+    /**[Note: For the time analysis we only look at the more complex factor of 'a' and 'b'.This being 'b', which we equate with 'n' for the time analysis]*/
+    if (b == 0) /* [1 time unit (base case), 1 from '==' ]*/
     {
-      //we know that x must be 1 if b is zero, since this also means that y is zero. We also know that a must equal the GCD, which we also know must be 1 at the lowest level.
-      return new int[] {1, 0}; /** [1 time unit (base case), 1 from return ]*/
+      //we know that 'x' must be 1 if 'b' is zero, since this also means that 'y' is zero. We also know that 'a' must equal the GCD, which we also know must be '1' at the lowest level - hence x must equal 1*a.
+      x_CurrentIteration = 1; /* [1 time unit (base case), 1 from '=' ]*/
+      y_CurrentIteration = 0; /* [1 time unit (base case), 1 from '=' ]*/
     }
     else
     {
-      //Since we are not allowed to pass x and y values downward, we will instead need to find the bottom values and work our way upward in a recursive manner.
-      //So at this point we simply call the next iteration of this EEA method, using the values we know will be a and b one level down:
+      //Since we are not allowed to pass 'x' and 'y' values downward as arguments in this EEA method, we will instead need to find the bottom values and work our way upward in a recursive manner.
+      //So at this point we simply call the next iteration of this EEA method, using the values we know will be 'a' and 'b' one level down:
 
-      downwardRecurringIterationResult = EAA(b, (a % b)); /** [3 time unit (recursive case),1 from recursive call, 1 from = and 1 from % ----> This is T(n)=1+1*T(n) ]*/
-    }
+      downwardRecurringIterationResult = EAA(b, (a % b)); /* [3 time unit (recursive case),1 from 'recursive call', 1 from '=' and 1 from '%' ----> This is T(n)=1+1*T(n) ]*/
 
-    /**Let us use this calculation example for the remainder of this method, to illustrate what actually happens at each step:
-     * We use this case as the example: EEA(102,53) -> We want to find 102 mod 53.
+      /**Let us use this calculation example for the remainder of this method, to illustrate what actually happens at each step:
+       * We use this case as the example: EEA(102,53) -> We want to find 102 mod 53.
        * 1st iteration: Value of downwardRecurringIterationResults is EEA(53, (102 % 53)) = EEA(53,49)
        * 2nd iteration: Value of downwardRecurringIterationResults is EEA(49, (53 % 49)) = EEA(49,4)
        * 3rd iteration: Value of downwardRecurringIterationResults is EEA(4, (49 % 4)) = EEA(49,1)
        * 4th iteration: Value of downwardRecurringIterationResults is EEA(1, (4 % 1)) = EEA(1,0) <----- HERE THE RECURSIVE LOOP DOWNWARD BREAKS AND BEGINS WORKING UPWARD AGAIN, SINCE b = 0!
-     * We know that for a to be 1 and b to be 0, x and y must each respectively be x = 1 and y = 0. -> And the product of these values should equal the GCD of 1.
-     *
-     * At the 4th iteration the nested calls begin working their way up the recursive ladder. We get these return values:
+
+       * We know that for 'a' to be '1' and 'b' to be '0', 'x' and 'y' must each respectively be 'x = 1' and 'y = 0'. -> And the product of these values should equal the GCD of '1'.
+
+       * At the 4th iteration the nested calls begin working their way up the recursive ladder. We get these return values:
        * 4th iteration returns [x=1, y=0]
-       * 3rd iteration proceeds with the below code, using x4=1 and y4=0.*/
+       * 3rd iteration proceeds with the below code, using 'x4' = 1 and 'y4' = 0.*/
 
-    //Since we have reached this line in the code, it means we are now working our way back upwards in our backward recurring sequence.
+      //Since we have reached this line in the code, it means we are now working our way back upwards in our backward recurring sequence.
 
-    //We now declare and initialize the relevant values for this iterations calculations:
-    //We extract our x and y values from our downward recurring iteration.
-    int x_PriorIteration = downwardRecurringIterationResult[0]; /** [1 time unit (recursive case), 1 from = ]*/
-    int y_PriorIteration = downwardRecurringIterationResult[1]; /** [1 time unit (recursive case), 1 from = ]*/
+      /** Here we utilize the knowledge we have from how the EEA recursive algorithm works.
+       * We know that 'b * y' in the current iteration becomes 'a * x' in the next, and that every iteration equals 1 (which is the GCD).
+       * Example:
+       * 0th iteration: a*x + b*y = 1
+       * 1st iteration: a1*x1 + b1*y1 = 1
+       * From the above relationship we equate these two iterations in a recurring manner: a*x + b*y = a1*x1 + b1*y1 = ..... = 1
 
-    //Going back upwards to the next EEA iteration we know that:
-    /** Here we utilize the knowledge we have from how the EEA recursive algorithm works.
-     * We know that b*y in the current iteration becomes a*x in the next.
-        * Example:
-        * 0th iteration: a*x + b*y = 1
-        * 1st iteration: a1*x1 + b1*y1 = 1
-        * From the above relationship equate these two iterations in a recurring manner: a*x + b*y = a1*x1 + b1*y1 = ..... = 1
+       * Thus we can express this relationship between the 4th and 3rd iteration:
+       * 4th iteration returns [x4=1, y4=0], where 'a4' = 1 and 'b4' = 0.
 
-        * Thus we can express this relationship between the 4th and 3rd iteration:
+       * In order to express the 'x' and 'y' values for the current iteration we work our known values a bit:
+       * a3*x3 + b3*y3 = a4*x4 + b4*y4
+       * a3*x3 + b3*y3 = b3*x4 + (a3 % b3)*y4
+       * a3*x3 + b3*y3 = b3*x4 + (a3 - b3*(a3|b3)) * y4
+       * a3*x3 + b3*y3 = b3*x4 + a3*y4 - b3*(a3-(a3|b3)*y4
+       * a3*x3 + b3*y3 = a3*y4 + b3*x4 - b3*(a3-(a3|b3)*y4
+       * a3*x3 + b3*y3 = a3*y4 + b3*(x4 - (a3|b3)*y4)
 
-        * 4th iteration returns [x4=1, y4=0], a4=1 and b4=0.
+       * Comparing the above coefficients using Bezout's theorem we see that for 'a3', both 'x3' and 'y4' are coefficients, and these are equal to each other. These coefficients are highlighted with [] in the below line:
+       * a3*[x3} + b3*[y3] = a3*[y4} + b3*[(x4 - (a3|b3)*y4)}
+       * thus 'x3' = 'y4' (or x_current_iteration will equal y_prior_iteration)
 
-        * In order to express the x and y values for the current iteration we work our known values a bit:
-        * a3*x3 + b3*y3 = a4*x4 + b4*y4
-        * a3*x3 + b3*y3 = b3*x4 + (a3 % b3)*y4
-        * a3*x3 + b3*y3 = b3*x4 + (a3 - b3*(a3|b3)) * y4
-        * a3*x3 + b3*y3 = b3*x4 + a3*y4 - b3*(a3-(a3|b3)*y4
-        * a3*x3 + b3*y3 = a3*y4 + b3*x4 - b3*(a3-(a3|b3)*y4
-        * a3*x3 + b3*y3 = a3*y4 + b3*(x4 - (a3|b3)*y4)
-        * Comparing the above coefficents using bezouts theorem we see that for a3, both x3 and y4 are coefficients, and these are equal to each other.
-          * thus x3 = y4 (or x_current will equal y_prior_iteration)
+       * we also see for 'b3' that the coefficients are either 'y3' or '(x4-(a3|b3)*y4)', and that these also both are equal each other.
+       * thus y3 = (x_prior_iteration - (a_current_iteration | b_current_iteration) * y_prior_iteration) */
 
-        * we also see for b3 that the coefficients are either y3 or (x4-(a3|b3)*y4), and that these also both are equal each other.
-          * thus y_current = (x_prior_iteration - (a_current|b_current)*y_prior_iteration)
-     * */
+      x_CurrentIteration = downwardRecurringIterationResult[1]; /** [1 time unit (recursive case), 1 from = ]*/
+      y_CurrentIteration = downwardRecurringIterationResult[0] - (a / b) * downwardRecurringIterationResult[1]; /** [4 time units (recursive case), 1 from =, 1 from -, 1 from / and 1 from * ]*/
+      //The division operation above ignores decimal results since it is working on integers. This is intentional here, since we want the divisor without remainder.
 
-    int x_CurrentIteration = y_PriorIteration; /** [1 time unit (recursive case), 1 from = ]*/
-    int y_CurrentIteration = x_PriorIteration - (a / b) * y_PriorIteration; /** [4 time units (recursive case), 1 from =, 1 from -, 1 from / and 1 from * ]*/
-    //The division operation ignores decimal results since it is working on integers. This is intentional here, since we want the divisor without remainder.
+    }
 
     //We have now calculated the current iterations x and y values, and can return these upward to the next recursive call, until we reach the initial call.
     return new int[] {x_CurrentIteration, y_CurrentIteration};
@@ -103,7 +104,6 @@ public class extendedEA
        * Now we convert this to Big-Oh by ignoring the constants:
        * T(n) = O(n)
       */
-
   }
 
   // Do not change methods below;
