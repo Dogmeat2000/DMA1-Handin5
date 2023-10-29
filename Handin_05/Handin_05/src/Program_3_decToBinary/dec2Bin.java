@@ -15,6 +15,26 @@ public class dec2Bin
 
     // TODO implement method
 
+    //Start of TODO
+    // Special case: If the input is 0, the binary representation is "0"
+    if (n == 0) {
+      binaryNum = "0";
+    } else {
+      // Convert decimal to binary
+      while (n > 0) {
+        // Get the remainder when dividing by 2 (this gives the rightmost bit)
+        int remainder = n % 2;
+
+        // Build the binary representation by adding the remainder at the beginning
+        binaryNum = remainder + binaryNum;
+
+        // Update n by dividing it by 2 (shift to the next bit)
+        n = n / 2;
+        // End of TODO
+      }
+    }
+
+
 
     return binaryNum;
   }
