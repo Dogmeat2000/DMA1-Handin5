@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/DMA1-Handins.iml" filepath="$PROJECT_DIR$/DMA1-Handins.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Handin_05/Handin_05/Handin_05.iml" filepath="$PROJECT_DIR$/Handin_05/Handin_05/Handin_05.iml" />
+      <module fileurl="file://$PROJECT_DIR$/DMA1 Handins/Handin_05/Handin_05.iml" filepath="$PROJECT_DIR$/DMA1 Handins/Handin_05/Handin_05.iml" />
       <module fileurl="file://$PROJECT_DIR$/Handin_06/Handin_06.iml" filepath="$PROJECT_DIR$/Handin_06/Handin_06.iml" />
     </modules>
   </component>

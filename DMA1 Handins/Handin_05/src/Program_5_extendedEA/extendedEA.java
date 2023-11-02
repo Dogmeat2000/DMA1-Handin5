@@ -30,32 +30,37 @@ public class extendedEA
     //Next we need to check if the 'b' value is zero. Since once, we have iterated our way to the end of the EEA algorithm the 'b' value should be zero for the gcd to return '1'.
     //If 'b' is zero, it means that this is the last iteration of this EEA call:
 
-    if (b == 0) /** [Time complexity = O(1), constant time (base case)] */
+    if (b == 0) /** [Time complexity = 1, constant time (base case)] */
     {
-      //we know that 'x' must be 1 if 'b' is zero, since this also means that 'y' is zero. We also know that 'a' must equal the GCD, which we also know must be '1' at the lowest level - hence x must equal 1*a.
-      x_CurrentIteration = 1; /** [Time complexity = O(1), constant time (base case)] */
-      y_CurrentIteration = 0; /** [Time complexity = O(1), constant time (base case)] */
+      //we know that 'x' must be 1 if 'b' is zero, since this also means that 'y' is zero. We also know that 'a' must equal the GCD, which we also know must be '1' at the lowest level - hence 'x' must equal '1 * a'.
+      x_CurrentIteration = 1; /** [Time complexity = 1, constant time (base case)] */
+      y_CurrentIteration = 0; /** [Time complexity = 1, constant time (base case)] */
     }
     else
     {
       //Since we are not allowed to pass 'x' and 'y' values downward as arguments in this EEA method, we will instead need to find the bottom values and work our way upward in a recursive manner.
       //So at this point we simply call the next iteration of this EEA method, using the values we know will be 'a' and 'b' one level down:
 
-      downwardRecurringIterationResult = EAA(b, (a % b)); /** [Time Complexity:
-     [For every recursive call here, we have that [a0,b0] calculates into [b0, a0 % b0] = [a1, b1] and results in one of these two possibilities:
+      downwardRecurringIterationResult = EAA(b, (a % b));
+      /** [Time Complexity: Written by K.Dashnaw
+     For every recursive call here, we have that [a0,b0] calculates into [b0, a0 % b0] = [a1, b1] and results in one of these two possibilities:
      * Case 1. 'b1' becomes a value larger than, or equal, to 'a0 / 2' -> The division by 2 is because this is the smallest value of division that will be applied, since division with '1' would result in an endless loop of modulus divisions.
      * The next recursive iteration will call a new value where b1 = a0 / 2, or where the largest value of b1 is half the size of 'a0'.
-     * Case 1. Thus for this case we get T(n) = O(b/2)
+     * Case 1. Thus for this case we get T(n) = b/2
 
      * Case 2. 'b1' becomes a value smaller than 'a0 / 2' -> this would result in the next iteration to calculate into 'a1 = b0', since prior iterations 'b' values in the euclidean algorithm turn into the next iterations 'a' values.
-     * Case 2. Thus for this case we get T(n) = O(a/2)]
+     * Case 2. Thus for this case we get T(n) = a/2
 
-     * Thus we can express the Big-Oh notation for this recursive step as:
-     * T(n) = O(a/2) + O(b/2)
+     * Thus we can express the recurring relation for this recursive step as:
+     * T(n) = a/2 + b/2
+
+     * From the above we have that either a or b can be n-bits long. We also know that a and b are depended on each other (number pairs), as current iterations b value becomes next iterations a value.
+     * As such in order to simplify this time complexity calculation, we ignore the a/2 part and focus on the b/2 part, equating 'b' to 'n'. We then get:
+     * T(n) = n/2
      * */
 
 
-      /**Let us use this calculation example for the remainder of this method, to illustrate what actually happens at each step:
+      /** Let us use this calculation example for the remainder of this method, to illustrate what actually happens at each step:
        * We use this case as the example: EEA(102,53) -> We want to find 102 mod 53.
        * 1st iteration: Value of downwardRecurringIterationResults is EEA(53, (102 % 53)) = EEA(53,49)
        * 2nd iteration: Value of downwardRecurringIterationResults is EEA(49, (53 % 49)) = EEA(49,4)
@@ -82,7 +87,7 @@ public class extendedEA
 
        * In order to express the 'x' and 'y' values for the current iteration we work our known values a bit:
        * a3*x3 + b3*y3 = a4*x4 + b4*y4
-       * a3*x3 + b3*y3 = b3*x4 + (a3 % b3)*y4
+       * a3*x3 + b3*y3 = b3*x4 + (a3 % b3)*y4     <- Rewrite the mod operation in the next line!
        * a3*x3 + b3*y3 = b3*x4 + (a3 - b3*(a3|b3)) * y4
        * a3*x3 + b3*y3 = b3*x4 + a3*y4 - b3*(a3-(a3|b3)*y4
        * a3*x3 + b3*y3 = a3*y4 + b3*x4 - b3*(a3-(a3|b3)*y4
@@ -95,35 +100,46 @@ public class extendedEA
        * we also see for 'b3' that the coefficients are either 'y3' or '(x4-(a3|b3)*y4)', and that these also both are equal each other.
        * thus y3 = (x_prior_iteration - (a_current_iteration | b_current_iteration) * y_prior_iteration) */
 
-      x_CurrentIteration = downwardRecurringIterationResult[1]; /** [Time complexity = O(1), constant time (recursive case)] */
-      y_CurrentIteration = downwardRecurringIterationResult[0] - (a / b) * downwardRecurringIterationResult[1]; /** [Time complexity = O(4), constant time (recursive case)] */
+      x_CurrentIteration = downwardRecurringIterationResult[1]; /** [Time complexity = 1, constant time (recursive case)] */
+      y_CurrentIteration = downwardRecurringIterationResult[0] - (a / b) * downwardRecurringIterationResult[1]; /** [Time complexity = 4, constant time (recursive case)] */
       //The division operation above ignores decimal results since it is working on integers. This is intentional here, since we want the divisor without remainder.
-
     }
 
     //We have now calculated the current iterations x and y values, and can return these upward to the next recursive call, until we reach the initial call.
-    return new int[] {x_CurrentIteration, y_CurrentIteration}; /** [Time complexity = O(1), constant time (base case)] */
+    return new int[] {x_CurrentIteration, y_CurrentIteration}; /** [Time complexity = 1, constant time (base case)] */
 
     /** Final Time Complexity Calculation:
-     * Since we want to express the time complexity as the worst-case value (Big-Oh), we can ignore constant time if we have non-constant time elements in our code. Let us review our lines of code:
-     * From line 33 we have: T(n) = O(1), constant time (base case)
-     * From line 36 we have: T(n) = O(1), constant time (base case)
-     * From line 37 we have: T(n) = O(1), constant time (base case)
-     * From line 44 we have: T(n) = O(a/2) + O(b/2)
-     * From line 98 we have: T(n) = O(1), constant time (recursive case)
-     * From line 105 we have: T(n) = O(4), constant time (recursive case)
-     * From line 105 we have: T(n) = O(1), constant time (base case)
+     * Since we want to express the time complexity as exactly as possible (Theta-Oh), we can ignore constant time if we have non-constant time elements in our code. Let us review our lines of code:
+     * From line 33 we have: T(n) = 1, constant time (base case)
+     * From line 36 we have: T(n) = 1, constant time (base case)
+     * From line 37 we have: T(n) = 1, constant time (base case)
+     * From line 44 we have: T(n) = n/2 (recursive case)
+     * From line 103 we have: T(n) = 1, constant time (recursive case)
+     * From line 104 we have: T(n) = 4, constant time (recursive case)
+     * From line 109 we have: T(n) = 1, constant time (base case)
 
-     * From the above lines, we see that in line 44, we have a non-constant time factor. Thus we ignore constant time in the other lines, and express our Big-Oh time complexity as:
-     * T(n) = O(a/2) + O(b/2)
+     * Since the factor determining when the recursive function will end is 'b = 0', we equate 'b' to 'n' for the remainder of this time complexity analysis:
+     * Base Case: Based on input from line 33, 36 & 37 while n = b = 0.
+     * T(0) = 4.
 
-     * Observing the above Big-Oh expression, we can also see that the worst-case decrease (division by 2, which results in the most recursive iterations), is similar to a logarithmic function [x/n] - as opposed to an exponential one [x^n].
-     * We can thus also express the Big-Oh notation as:
-     * T(n) = O(log(a)) + O(log(b)).
+     * Recursive Case: Based on input from line 44 (see line 59), 103 & 104.
+     * T(n) = T(n/2) + 5
 
-     * Using basic math principles [log(x * y) = log(x) + log(y).] we can reduce this to a single expression, such that:
-     * Final Big-Oh Notation -> T(n) = O(log(a * b))
-     * */
+     * Now let us calculate a few n values, starting from 'n = 5' to see how the recursive case increases in time complexity:
+     * T(5) = T(5/2) + 5
+     * T(5/2) = T((5/2)/2) + 5 = T(5/4) + 5
+     * T(5/4) = T((5/4)/2) + 5 = T(5/8) + 5
+     * T(5/8) = T((5/8)/2) + 5 = T(5/16) + 5
+
+     * From the above we can see how the growth rate increases logarithmic (n / 2^i). As opposed to a exponential growth (n^i)
+     * As such we can also express this part as log(n) time complexity.
+     * We can thus express our time complexity as:
+     * T(n) = O(log(n)+5)
+
+     * Since the constants aren't important for the computational growth of this piece of code, we can simply remove those.
+     * Our final time complexity thus becomes:
+     * T(n) = O(log(n))
+     */
 
   }
 
