@@ -4,7 +4,7 @@ public class dodgeBall
 {
   // Add any private fields you might need here
   private int xPos;
-  private ArrayList<Integer> playerList;
+  private int[] playerList;
 
   //Kristian Dashnaw
   public void addPlayer(int x)
@@ -25,10 +25,11 @@ public class dodgeBall
       this.xPos = x;
     }
 
-    //Check if this is the first player being added. If so, initialize the playerList arrayList:
+    //Check if this is the first player being added. If so, initialize the playerList array, with a fixed capacity of 5,000,000:
+    //NOTE TO SELF: I SHOULD PROBABLY USE AN ARRAYLIST INSTEAD WITH NO FIXED PLAYER COUNT UPPERLIMIT!
     if(this.playerList == null)
     {
-      playerList = new ArrayList<>(5000000);
+      playerList = new int[5000000];
     }
 
 
