@@ -1,6 +1,5 @@
-package ReversePolishNotation;
-
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 public class ReversePolishCalculator
 {

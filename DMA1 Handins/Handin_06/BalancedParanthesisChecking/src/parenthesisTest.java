@@ -1,5 +1,3 @@
-package BalancedParenthesisChecking;
-
 import java.util.ArrayList;
 
 public class parenthesisTest

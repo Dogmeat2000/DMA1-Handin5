@@ -1,5 +1,3 @@
-package QueueSimulation;
-
 import java.util.ArrayList;
 
 public class QueueTest

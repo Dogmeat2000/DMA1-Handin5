@@ -1,5 +1,3 @@
-package dodgeBall;
-
 public class testDodge
 {
   public static void testAll() {

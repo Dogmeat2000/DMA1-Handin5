@@ -1,5 +1,3 @@
-package ReversePolishNotation;
-
 public class RPNTest {
   public static void testAll() {
     //clearTerminal();
