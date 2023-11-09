@@ -1,7 +1,5 @@
 package dodgeBall;
 
-import java.util.*;
-import java.util.ArrayList;
 import java.util.TreeSet;
 
 public class dodgeBall
@@ -10,7 +8,8 @@ public class dodgeBall
   private TreeSet<Integer> balancedBinarySearchTree;
 
   //Kristian Dashnaw
-  //Jeg droppede min anden manuelle implementation af binary search trees. Jeg kunne ikke holde antallet af operationer under 500,000 i forbindelse med den løbende rotation af de givne "nodes" når de kom ud af balance.
+  //Jeg droppede min anden manuelle implementation af binary search trees. Jeg kunne ikke holde antallet af operationer under 500,000 i værste fald (med fem millioner spillere på linien),
+  //i forbindelse med den løbende rotation af de givne "nodes" når de kom ud af balance.
   public void addPlayer(int x)
   {
     // Implement your code here to add a player to the line
@@ -86,18 +85,33 @@ public class dodgeBall
       else
       {
         //There is a predecessor. Lets save it.
-        xPosPredecessor = this.balancedBinarySearchTree.floor(x);
+        try
+        {
+          xPosPredecessor = this.balancedBinarySearchTree.floor(x);
+        }
+        catch(NullPointerException error)
+        {
+          System.out.println("Erro, read: " + error);
+        }
+
       }
 
-      //First we check if there exists a successor (value larger than x) in the balanced tree:
+      //Then we check if there exists a successor (value larger than x) in the balanced tree:
       if(this.balancedBinarySearchTree.ceiling(x) == null)
       {
         //There is no larger value in the tree. Thus, there can be no predecessor.
       }
       else
       {
-        //There is a predecessor. Lets save it.
-        xPosSuccessor = this.balancedBinarySearchTree.ceiling(x);
+        //There is a successor. Lets save it.
+        try
+        {
+          xPosSuccessor = this.balancedBinarySearchTree.ceiling(x);
+        }
+        catch(NullPointerException error)
+        {
+          System.out.println("Erro, read: " + error);
+        }
       }
 
       //We now determine which player to move to the balls location:
