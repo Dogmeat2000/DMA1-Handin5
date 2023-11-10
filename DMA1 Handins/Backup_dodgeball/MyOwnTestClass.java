@@ -44,13 +44,13 @@ public class MyOwnTestClass
     //Print depth level 0
     treePlayerList1.add(b.playerList.get(b.iRootIndexPosition));
     depth_zero[0] = b.playerList.get(b.iRootIndexPosition).get(0);
-    System.out.println("d0:\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t[" + depth_zero[0] + "]");
+    System.out.println("d0:                                                                                     [" + depth_zero[0] + "]");
 
     //System.out.println(treePlayerList1 + "\n");
 
 
     //Print depth level 1
-    System.out.print("\nd1:\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
+    System.out.print("d1:                                                                                   ");
     int indexArrayCounter = 0;
     for (int i = 0; i < treePlayerList1.size(); i++)
     {
@@ -138,7 +138,7 @@ public class MyOwnTestClass
 
 
     //Print depth level 2
-    System.out.print("\nd2:\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
+    System.out.print("d2:                                       ");
     indexArrayCounter = 0;
     for (int i = 0; i < treePlayerList2.size(); i++)
     {
@@ -188,11 +188,11 @@ public class MyOwnTestClass
       {
         if (i % 2 != 0)
         {
-          System.out.print("]\t\t\t\t");
+          System.out.print("] ");
         }
         else
         {
-          System.out.print("]\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
+          System.out.print("]------------------------------------------------------------------------------");
         }
       }
     }
@@ -201,7 +201,7 @@ public class MyOwnTestClass
     //System.out.println(treePlayerList1 + "\n");
 
     //Print depth level 3
-    System.out.print("\nd3:\t\t\t\t\t\t\t\t\t\t\t");
+    System.out.print("d3:                  ");
     indexArrayCounter = 0;
     for (int i = 0; i < treePlayerList1.size(); i++)
     {
@@ -251,11 +251,11 @@ public class MyOwnTestClass
       {
         if (i % 2 != 0)
         {
-          System.out.print("]\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
+          System.out.print("]                                    ");
         }
         else
         {
-          System.out.print("]\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
+          System.out.print("]----------------------------------");
         }
       }
     }
@@ -263,7 +263,7 @@ public class MyOwnTestClass
     treePlayerList1.clear();
 
     //Print depth level 4
-    System.out.print("\nd4:\t\t\t\t");
+    System.out.print("d4:      ");
     indexArrayCounter = 0;
     for (int i = 0; i < treePlayerList2.size(); i++)
     {
@@ -313,11 +313,11 @@ public class MyOwnTestClass
       {
         if (i % 2 != 0)
         {
-          System.out.print("]\t\t\t\t\t\t\t\t\t\t");
+          System.out.print("]             ");
         }
         else
         {
-          System.out.print("]\t\t\t\t\t\t\t\t\t\t");
+          System.out.print("]-------------");
         }
       }
     }
@@ -327,7 +327,7 @@ public class MyOwnTestClass
 
 
     //Print depth level 5
-    System.out.print("\nd5:\t");
+    System.out.print("d5:\t");
     indexArrayCounter = 0;
     for (int i = 0; i < treePlayerList1.size(); i++)
     {
@@ -377,17 +377,15 @@ public class MyOwnTestClass
       {
         if (i % 2 != 0)
         {
-          System.out.print("]\t\t\t\t");
+          System.out.print("]   ");
         }
         else
         {
-          System.out.print("]\t\t");
+          System.out.print("]-");
         }
       }
     }
     //Clear previous treePlayerList, so we can fill it with the next depth levels values:
     treePlayerList1.clear();
-
-
   }
 }
