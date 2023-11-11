@@ -349,5 +349,5 @@ public class dodgeBall
  *  T(5,000,000) = 20 + 4*Log(5,000,000) = 109.01 operations (rounded).
 
  *  CONCLUSION:
- *  Both implemented methods are very fast, significantly faster than the limitation of five million operations pr. execution.
+ *  Both implemented methods are very fast, significantly faster than the limitation of five hundred thousand operations pr. execution.
  * */
