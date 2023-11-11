@@ -7,23 +7,28 @@ public class ReversePolishCalculator
   private final Deque<Integer> stack = new ArrayDeque<>();
 
   public void push(int n) {
-    // TODO Insert your method here
+    stack.push(n);
   }
 
   public void plus() {
-    // TODO Insert your method here
+    int topelement = stack.pop();
+    int topelement2 = stack.pop();
+    stack.push(topelement2+topelement);
   }
 
   public void minus() {
-    // TODO Insert your method here
+    int topelement = stack.pop();
+    int topelement2 = stack.pop();
+    stack.push(topelement2-topelement);
   }
 
   public void times() {
-    // TODO Insert your method here
+    int topelement = stack.pop();
+    int topelement2 = stack.pop();
+    stack.push(topelement2*topelement);
   }
 
   public int read() {
-    // TODO Insert your method here and update the return statement
-    return 42;
+    return stack.peek();
   }
 }
