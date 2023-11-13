@@ -1,410 +1,353 @@
 package dodgeBall;
 
-import java.util.ArrayList;
+import java.util.TreeSet;
 
 public class dodgeBall
 {
   // Add any private fields you might need here
-
-  /** REMEMBER TO CHANGE PUBLIC ATTRIBUTES TO PRIVATE AFTER TESTING! */
-  public ArrayList<ArrayList<Integer>> playerList; //This arrayList will be used to contain added x coordinates of all players on the field at any time.
-  public ArrayList<Integer> player; //This arrayList will be used to contain these values for each player={x position, left_child_index, right_child_index, parent_index, node balance value}.
-  private int iNumOfOperations;
-  private int iNumOfPlayersInArray; //Contains the number of players in the array (on the line) at any point in time.
-
-  public int iRootIndexPosition; //Used to contain the index position of the root node. I use a balanced binary tree to sort the above ArrayList.
+  private TreeSet<Integer> balancedBinarySearchTree;
 
   //Kristian Dashnaw
+  //Jeg droppede min anden manuelle implementation af binary search trees. Jeg kunne ikke holde antallet af operationer under 500,000 i værste fald (med fem millioner spillere på linien) i forbindelse med den løbende rotation af de givne "nodes" når de kom ud af balance.
   public void addPlayer(int x)
   {
     // Implement your code here to add a player to the line
-    int xPos, lowX, midX, highX;
+
+    //In order to effectively implement this algorithm, I have decided to use the Balanced Binary Search Trees available through the Java TreeSet library.
+    //This is documented here: https://github.com/Mortal/csaudk-submitj/tree/master/javalib#readme
+    //Specifically I use these methods from the TreeSet library:
+    //1. Create new tree                  : TreeSet<Integer> tree = new TreeSet<>();  [Time Complexity is given as: O(1)]
+    //2. Add a new node/leaf              : tree.add(x);                              [Time Complexity is given as: O(log N)]
+    //3. Remove a node/leaf               : tree.remove(x);                           [Time Complexity is given as: O(log N)]
+    //4. Check if tree contains node      : if (tree.contains(x)) { ... };            [Time Complexity is given as: O(log N)]
+    //5. Get predecessor of the node/leaf : Integer p = tree.floor(x);                [Time Complexity is given as: O(log N)]
+    //6. Set predecessor of the node/leaf : Integer s = tree.ceiling(x);              [Time Complexity is given as: O(log N)]
+    //These time complexities are given here: https://github.com/Mortal/csaudk-submitj/blob/master/javalib/TreeSet.md
+
+    int xPos;
 
     //Validate input, ensuring that worked attributes are within the input constraints of [1 <= x <= 5,000,000]
-    if (x < 1)
+    if (x < 1) /** Case A1: [Time complexity = O(1), from "<" operator] */
     {
       System.out.println("Given x-value (x=" + x
-          + ") is outside the legal scope. Changing x to x=1. (min. legal value)");
-      xPos = 1;
+          + ") is outside the legal scope. Changing x to x=1. (min. legal value)"); /** Case A1:  [Time complexity = O(2), from 2 "+" operators] */
+      xPos = 1; /** Case A1:  [Time complexity = O(1), from 1 "=" operator] */
     }
-    else if (x > 5000000)
+    else if (x > 5000000) /** Case A2: [Time complexity = O(1), from ">" operator] */
     {
       System.out.println("Given x-value (x=" + x
-          + ") is outside the legal scope. Changing x to x=5000000. (max. legal value)");
-      xPos = 5000000;
+          + ") is outside the legal scope. Changing x to x=5000000. (max. legal value)"); /** Case A2:  [Time complexity = O(2), from 2 "+" operators] */
+      xPos = 5000000; /** Case A2:  [Time complexity = O(1), from 1 "=" operator] */
     }
     else
     {
-      xPos = x;
+      xPos = x; /** Case A3: [Time complexity = O(1), from "=" operator] */
     }
 
-    //Check if this is the first player being added. If so, initialize the playerList array, with a fixed capacity of 5,000,000:
-    if (this.playerList == null)
+    //Check if this is the first player being added. If so, initialize the Balanced Binary Search Tree (type TreeSet):
+    if (this.balancedBinarySearchTree == null) /** Case B1: [Time complexity = O(1), from "==" operator] */
     {
-      //Create
-      this.player = new ArrayList<>();
-      this.player.add(0, xPos);
-      this.player.add(1, -1); //left_child_index. -1 means no child.
-      this.player.add(2, -1); //right_child_index. -1 means no child.
-      this.player.add(3, -1); //parent_index. -1 means no parent.
-      this.player.add(4,
-          0); //node balance value. Set to zero as first root has no children.
+      //Create tree
+      this.balancedBinarySearchTree = new TreeSet<>(); /** Case B1: [Time complexity = O(1), from "=" operator] */
 
-      this.playerList = new ArrayList<>();
-      //Since the playerList has just been created, we know that it is impossible for other players to currently be on the field. So we simply add the new player to the field:
-      this.playerList.add(this.player);
-      this.iRootIndexPosition = 0;
+      //Since the tree has just been created, we know that it is impossible for other players to currently be on the field. So we simply add the new player to the field, without further evaluations:
+      this.balancedBinarySearchTree.add(
+          xPos); /** Case B1: [Time complexity = O(log N), from "tree.add(x)" method call] */
     }
+    //If we failed the above test, it means that there are players in the list.
     else
     {
-      //There are already players on the field, so we now must analyze the current playerList to see where to insert the new player in a sorted manner.
-
-      //We use the principle behind a binary tree to find where to insert our player.
-      /**SLET DENNE LINIE???? We utilize an "inorder" search method, which basically involves the following evaluations 1: traverse left child. 2: visit node. 3: traverse right child.*/
-      int currentNodeIndex = this.iRootIndexPosition;
-      boolean playerEvaluationCompleted = false;
-      boolean addedLeftChild = false;
-      boolean addedRightChild = false;
-      boolean FinalIteration = false;
-
-      while (!playerEvaluationCompleted)
+      //We first check if there already exists a player on the given x-coordinate:
+      if (this.balancedBinarySearchTree.contains(xPos)) /** Case B2A: [Time complexity = O(log N), from "tree.contains(x)" method call] */
       {
-        //First we evaluate whether the given x-value is equal to the current nodes value. If yes, we do NOT add the player.
-
-        if (this.playerList.get(currentNodeIndex).get(0) == xPos)
-        {
-          //The given x-value is equal to the current nodes value. we DO NOT add the player in this case.
-          System.out.println(
-              "Player was not added: X-position already occupied by another player.");
-          playerEvaluationCompleted = true;
-        }
-        //Now we evaluate whether the given x-value should be added to the left, or to the right of the current node.
-        //First we check if the given x-value should be added to the left of the current nodes x-value:
-        else if (xPos < this.playerList.get(currentNodeIndex).get(0))
-        {
-          //xPos belongs to the left of the current nodes value.
-
-          //Now we check if there already is a left-child:
-          if (this.playerList.get(currentNodeIndex).get(1) != -1)
-          {
-            //Current node has a left child. We now must evaluate this left child as the new current node.
-            currentNodeIndex = this.playerList.get(currentNodeIndex).get(1);
-          }
-          else
-          {
-            //Current node has no left child. We add the given x-value as the new left child:
-
-            //Create a new leaf
-            this.player = new ArrayList<>();
-            this.player.add(xPos);
-            this.player.add(-1); //left_child_index. -1 means no child.
-            this.player.add(-1); //right_child_index. -1 means no child.
-            this.player.add(currentNodeIndex); //parent_index.
-            this.player.add(
-                0); //node balance value. Set to zero as leafs root have no children.
-
-            //Adding the created leaf to the playerList. We use "playerList.size()" to avoid calling the built-in Java search methods that are implemented within .contains(), in order to reduce CPU iterations/clock-cycles.
-            int leftChildLeafIndex = this.playerList.size();
-            this.playerList.add(leftChildLeafIndex, this.player);
-            playerEvaluationCompleted = true;
-            addedLeftChild = true;
-
-            //Update the parent nodes attributes so that the added child is properly referenced:
-            this.playerList.get(currentNodeIndex).set(1, leftChildLeafIndex);
-          }
-        }
-        else
-        {
-          //xPos belongs to the right of the current nodes value. We already checked earlier if the given x-value is equal to the current nodes x-value. So at this point we know that the given x-value must be larger.
-
-          //Now we check if there already is a right-child:
-          if (this.playerList.get(currentNodeIndex).get(2) != -1)
-          {
-            //Current node has a right child. We now must evaluate this right child as the new current node.
-            currentNodeIndex = this.playerList.get(currentNodeIndex).get(2);
-          }
-          else
-          {
-            //Current node has no right child. We add the given x-value as the new right child:
-
-            //Create a new leaf
-            this.player = new ArrayList<>();
-            this.player.add(xPos);
-            this.player.add(-1); //left_child_index. -1 means no child.
-            this.player.add(-1); //right_child_index. -1 means no child.
-            this.player.add(currentNodeIndex); //parent_index.
-            this.player.add(
-                0); //node balance value. Set to zero as leafs root have no children.
-
-            //Adding the created leaf to the playerList. We use "playerList.size()" to avoid calling the built-in Java search methods that are implemented within .contains(), in order to reduce CPU iterations/clock-cycles.
-            int rightChildLeafIndex = this.playerList.size();
-            this.playerList.add(rightChildLeafIndex, this.player);
-            playerEvaluationCompleted = true;
-            addedRightChild = true;
-
-            //Update the parent nodes attributes so that the added child is properly referenced:
-            this.playerList.get(currentNodeIndex).set(2, rightChildLeafIndex);
-          }
-        }
+        //The given x-coordinate is already occupied. we DO NOT add the player in this case.
+        System.out.println(
+            "Player was not added: X-position already occupied by another player.");
       }
-      //Having added the player to our ArrayList in a sorted manner, we now must update all parents/grandparents/etc. all the way up to the root in order to determine tree balance, updating the balance attributes.
-      //As well as where needed, rotating the tree and updating the root value.
-
-      if(addedLeftChild || addedRightChild)
+      else
       {
-        do
-        {
-          /**WORK ON THIS PART MORE!*/
-          int currentParentBalance = this.playerList.get(currentNodeIndex).get(4);
-          if (addedLeftChild)
-          {
-            //If left child was added to the node, we subtract 1 from the balance.
-            this.playerList.get(currentNodeIndex)
-                .set(4, currentParentBalance - 1);
-            addedLeftChild=false;
-          }
-          else if (addedRightChild)
-          {
-            //If right child was added to the node, we add 1 to the balance.
-            this.playerList.get(currentNodeIndex)
-                .set(4, currentParentBalance + 1);
-            addedRightChild=false;
-
-            int updatingParentNodes_BalanceIndex = this.playerList.get(currentNodeIndex).get(3);
-            if(updatingParentNodes_BalanceIndex == -1)
-            {
-              updatingParentNodes_BalanceIndex = this.iRootIndexPosition;
-            }
-
-            boolean finalLap = false;
-            while(updatingParentNodes_BalanceIndex != this.iRootIndexPosition || finalLap)
-            {
-              int leftChild_BalanceValue;
-              System.out.println(this.playerList.get(updatingParentNodes_BalanceIndex));
-              if(this.playerList.get(updatingParentNodes_BalanceIndex).get(1) != -1)
-              {
-                leftChild_BalanceValue = this.playerList.get(this.playerList.get(updatingParentNodes_BalanceIndex).get(1)).get(4);
-              }
-              else
-              {
-                leftChild_BalanceValue = 0;
-              }
-
-              int rightChild_BalanceValue;
-              if(this.playerList.get(updatingParentNodes_BalanceIndex).get(2) != -1)
-              {
-                rightChild_BalanceValue = this.playerList.get(this.playerList.get(updatingParentNodes_BalanceIndex).get(2)).get(4);
-              }
-              else
-              {
-                rightChild_BalanceValue = 0;
-              }
-
-              int newBalanceValue = rightChild_BalanceValue - leftChild_BalanceValue;
-              this.playerList.get(updatingParentNodes_BalanceIndex).set(4, newBalanceValue);
-
-              updatingParentNodes_BalanceIndex = this.playerList.get(this.playerList.get(currentNodeIndex).get(3)).get(3);
-
-              if(finalLap)
-              {
-                finalLap = false;
-                System.out.println("Final lap");
-              }
-              else
-              {
-                if(updatingParentNodes_BalanceIndex == this.iRootIndexPosition)
-                {
-                  finalLap = true;
-                }
-              }
-
-            }
-
-          }
-          currentParentBalance = this.playerList.get(currentNodeIndex).get(4);
-
-          //We now check if the tree is unbalanced. It will be unbalanced if the current node has a balance that is not either -1, 0 or 1.
-          if (currentParentBalance < -1 || currentParentBalance > 1)
-          {
-            //Current tree is unbalanced. We need to perform a rotation.
-
-            //Case: Left-left heavy tree (Parent balance is -2, and left child IS NOT -1 or +1
-            //Solution: Rotate right around root.
-            if(currentParentBalance == -2 && this.playerList.get(this.playerList.get(currentNodeIndex).get(1)).get(4) != -1 && this.playerList.get(this.playerList.get(currentNodeIndex).get(1)).get(4) != 1)
-            {
-              System.out.println("Tree is unbalanced. It is left-left heavy.");
-
-              //New root will be the current root nodes' left child:
-              int newRootIndex = this.playerList.get(this.iRootIndexPosition).get(1);
-
-              //New right child of the new root node will be the old root node.
-              int newRootRightChildIndex = this.iRootIndexPosition;
-
-              //New left child of the old root node will be the old left childs' right node.
-              int newRightChildLeftLeafIndex = this.playerList.get(this.playerList.get(this.iRootIndexPosition).get(1)).get(2);
-
-              //Perform the right rotation:
-
-              //  Set the new root nodes' attributes:
-              this.playerList.get(newRootIndex).set(2, newRootRightChildIndex); //Sets new right child, to the old root.
-              this.playerList.get(newRootIndex).set(3,-1); //Sets new parent to -1 (no parent).
-              this.playerList.get(newRootIndex).set(4,0); //Sets new balance to 0 (balanced).
-
-              //  Set the new attributes for the old root node:
-              this.playerList.get(iRootIndexPosition).set(1, newRightChildLeftLeafIndex); //Sets new left child, to the old root's right child.
-              this.playerList.get(iRootIndexPosition).set(3,newRootIndex); //Sets new parent to the new root.
-              this.playerList.get(iRootIndexPosition).set(4,0); //Sets new balance to 0 (balanced).
-
-              //  Set the new attributes for the old root node's left child's right leaf node:
-              this.playerList.get(this.playerList.get(newRootIndex).get(2)).set(3,this.iRootIndexPosition); //Sets new parent to the old root node's left child's right leaf node.
-
-              //Update the global attribute pointing to the now current root node.
-              this.iRootIndexPosition = newRootIndex;
-            }
-
-
-
-
-
-
-
-
-
-            //Case: Left-right heavy tree
-
-            //Case: Critically unbalanced left-left heavy tree (parent balance is -2, left-child balance is -1)
-            //Solution: Rotate right around parent.
-
-            //Case: Critically unbalanced left-right heavy tree (Parent balance is -2, left-child balance is +1)
-            //Solution: 1. Rotate left around child, then 2. rotate right around parent.
-            if(currentParentBalance == -2 && this.playerList.get(this.playerList.get(currentNodeIndex).get(1)).get(4) == 1)
-            {
-
-              System.out.println("Tree is unbalanced. It is critical left-right heavy.");
-              //Perform the initial left rotation around the child
-
-              //New right sub-child for the parents old left child will be:
-              int oldLeftChild_NewRightChildIndex = this.playerList.get(this.playerList.get(this.playerList.get(currentNodeIndex).get(1)).get(2)).get(1);
-
-              //New left child for the parent will be:
-              int oldLeftChild_OldRightChildIndex = this.playerList.get(this.playerList.get(currentNodeIndex).get(1)).get(2);
-
-              //Parents old left childs' right sub-child's new left sub-sub-child index is:
-              int oldLeftChildsRightChild_NewLeftChild = this.playerList.get(currentNodeIndex).get(1);
-
-              //  Set the new attributes for the parents old left child:
-              this.playerList.get(this.playerList.get(currentNodeIndex).get(1)).set(2, oldLeftChild_NewRightChildIndex); //sets this nodes' new right child.
-              this.playerList.get(this.playerList.get(currentNodeIndex).get(1)).set(3,oldLeftChild_OldRightChildIndex); //Sets the new parent to the node.
-              this.playerList.get(this.playerList.get(currentNodeIndex).get(1)).set(4,0); //Sets new balance to 0 (balanced).
-
-              //  Set the new attributes for the old left-childs' right sub-child:
-              this.playerList.get(oldLeftChild_OldRightChildIndex).set(1,oldLeftChildsRightChild_NewLeftChild); //sets this nodes' new left child.
-              this.playerList.get(oldLeftChild_OldRightChildIndex).set(3,currentNodeIndex); //Sets the new parent to the node.
-              this.playerList.get(oldLeftChild_OldRightChildIndex).set(4,-2); //Sets new balance to 0 (balanced).
-
-              //  Set the parent nodes' changed attributes:
-              this.playerList.get(currentNodeIndex).set(1, oldLeftChild_OldRightChildIndex); //Sets new left child.
-
-
-
-              //Perform the final right rotation:
-
-              //New parent will be the current parent nodes' left child:
-              int newParentIndex = this.playerList.get(currentNodeIndex).get(1);
-
-              //New right child of the new root node will be the old root node.
-              int newParentRightChildIndex = currentNodeIndex;
-
-              //New left child of the old parent node will be the old left childs' right node.
-              int newRightChildLeftLeafIndex = this.playerList.get(this.playerList.get(currentNodeIndex).get(1)).get(2);
-
-
-              //  Set the new parent nodes' attributes:
-              this.playerList.get(newParentIndex).set(2, newParentRightChildIndex); //Sets new right child, to the old root.
-              this.playerList.get(newParentIndex).set(3,-1); //Sets new parent to -1 (no parent).
-              this.playerList.get(newParentIndex).set(4,0); //Sets new balance to 0 (balanced).
-
-              //  Set the new attributes for the old parent node:
-              this.playerList.get(currentNodeIndex).set(1, newRightChildLeftLeafIndex); //Sets new left child, to the old parent's right child.
-              this.playerList.get(currentNodeIndex).set(3,newParentIndex); //Sets new parent to the old parent.
-              this.playerList.get(currentNodeIndex).set(4,0); //Sets new balance to 0 (balanced).
-
-              //  Set the new attributes for the old parent node's left child's right leaf node:
-              this.playerList.get(this.playerList.get(newParentIndex).get(2)).set(3,currentNodeIndex); //Sets new parent to the old parent node's left child's right leaf node.
-
-              //Update the global attribute pointing to the now current root node.
-              if(this.playerList.get(newParentIndex).get(3) == -1)
-              {
-                this.iRootIndexPosition = newParentIndex;
-              }
-
-            }
-
-
-            //Case: Critically unbalanced right-right heavy tree (Parent balance is +2, right child balance is +1)
-            //Solution: Rotate left around parent.
-
-            //Case: Critically unbalanced right-left heavy tree (Parent balance is +2, right child balance is -1)
-            //Solution: 1. Rotate right around child, then 2. rotate left around parent.
-
-            if(currentNodeIndex == this.iRootIndexPosition)
-            {
-              FinalIteration=true;
-            }
-
-            if(this.playerList.get(currentNodeIndex).get(3) != -1)
-            {
-              currentNodeIndex = this.playerList.get(currentNodeIndex).get(3);
-            }
-
-          }
-          else
-          {
-            //Tree is not unbalanced, so far. We continue updating parent node balances until reaching the root node.
-
-            if(currentNodeIndex == this.iRootIndexPosition)
-            {
-              FinalIteration=true;
-            }
-
-            if(currentNodeIndex != this.iRootIndexPosition)
-            {
-              currentNodeIndex = this.playerList.get(currentNodeIndex).get(3);
-            }
-          }
-        }
-        while (currentNodeIndex != this.iRootIndexPosition || !FinalIteration);
+        this.balancedBinarySearchTree.add(
+            xPos); /** Case B2B: [Time complexity = O(log N), from "tree.add(x)" method call] */
       }
-
-
     }
-
   }
+
+  /** Time complexity Analysis of the .addPlayer() method:
+   * As documented in the above code, we can extract these time complexities from each line of the code:
+   * Line 30: Case A1: T(N) = O(1)
+   * Line 33: Case A1: T(N) = O(2)
+   * Line 34: Case A1: T(N) = O(1)
+   * Line 36: Case A2: T(N) = O(1)
+   * Line 39: Case A2: T(N) = O(2)
+   * Line 40: Case A2: T(N) = O(1)
+   * Line 44: Case A3: T(N) = O(1)
+   * Line 48: Case B1: T(N) = O(1)
+   * Line 51: Case B1: T(N) = O(1)
+   * Line 55: Case B1: T(N) = O(log N)
+   * Line 61: Case B2A: T(N) = O(log N)
+   * Line 70: Case B2B: T(N) = O(log N)
+
+   * We can compact these further, such that:
+   * Line 30+33+34  : Case A1: T(N)   = O(1) + O(2) + O(1) = O(4)
+   * Line 36+39+40  : Case A2: T(N)   = O(1) + O(2) + O(1) = O(4)
+   * Line 44        : Case A3: T(N)   = O(1)
+   * Line 48+51+55  : Case B1: T(N)   = O(1) + O(1) + O(log N) = O(2) + O(log N)
+   * Line 61        : Case B2A: T(N)  = O(log N)
+   * Line 70        : Case B2B: T(N)  = O(log N)
+
+   * In order to determine the time complexity during the worst-case scenario, we evaluate each section of the algorithm.
+   * Since the given if-statements cannot be both true and false at the same time, we know that only one of Case A1-A3 is executed pr. method call.
+   * Similarly, we know that only one of Case B1-B2B is executed pr. method call.
+   * We observe that both case A1 and A2 have similar time complexities with a constant time of O(4), where Case A3 is faster with a constant time of O(1).
+   * Thus, we choose to use O(4) below, in evaluating this methods overall T(N).
+
+   * For the second part of the method, we can also see that Case B1 is the most complex, with a combination of constant time and logarithmic time: O(2) + O(Log N).
+   * Thus, we choose to use Case B1 below, in evaluating this methods overall T(N).
+
+   * From the above, we can express the T(N) of addPlayer() in a single expression as:
+   * addPlayer(), T(N) = O(4) + O(2) + O(Log N).
+   * addPlayer(), T(N) = O(6) + O(Log N).
+
+   * Since we must evaluate the worst-case performance, we can ignore constants.
+   * This leaves us with the time complexity for this method being in logarithmic time.
+   * addPlayer(), T(N) = O(Log N).
+   * */
+
 
   public int throwBall(int x)
   {
-    int distance = 0;
-    int xPosClosestPlayer = -1; //Placeholder value. Negative values are not allowed in an array.
-    int xPosSecondClosestPlayer = -1; //Placeholder value. Negative values are not allowed in an array.
+    // Implement your code here to update the line of players and return the distance
 
-    //First we check if the position was occupied with a player. If so, we kill the player:
-    /*if(this.playerList[x] == 1)
+    //In order to effectively implement this algorithm, I have decided to use the Balanced Binary Search Trees available through the Java TreeSet library.
+    //This is documented here: https://github.com/Mortal/csaudk-submitj/tree/master/javalib#readme
+    //Specifically I use these methods from the TreeSet library:
+    //1. Create new tree                  : TreeSet<Integer> tree = new TreeSet<>();  [Time Complexity is given as: O(1)]
+    //2. Add a new node/leaf              : tree.add(x);                              [Time Complexity is given as: O(log N)]
+    //3. Remove a node/leaf               : tree.remove(x);                           [Time Complexity is given as: O(log N)]
+    //4. Check if tree contains node      : if (tree.contains(x)) { ... };            [Time Complexity is given as: O(log N)]
+    //5. Get predecessor of the node/leaf : Integer p = tree.floor(x);                [Time Complexity is given as: O(log N)]
+    //6. Set predecessor of the node/leaf : Integer s = tree.ceiling(x);              [Time Complexity is given as: O(log N)]
+    //These time complexities are given here: https://github.com/Mortal/csaudk-submitj/blob/master/javalib/TreeSet.md
+
+    int xPos, distance;
+    //Placeholder values inserted below:
+    int xPosPredecessor = -1; /** Base Case: [Time complexity = O(1), from 1 use of "=" operator] */
+    int xPosSuccessor = -1; /** Base Case: [Time complexity = O(1), from 1 use of "=" operator] */
+
+    //Validate input, ensuring that worked attributes are within the input constraints of [1 <= x <= 5,000,000]
+    //(This is duplicate code from the "addPlayer" method. Ideally I would want to place this input validation in a method of its own.)
+
+    if (x < 1) /** Case A1: [Time complexity = O(1), from "<" operator] */
     {
-      //Player at position. Kill the player.
-      this.playerList[x] = 0;
-      iNumOfPlayersInArray -= 1;
+      System.out.println("Given x-value (x=" + x
+          + ") is outside the legal scope. Changing x to x=1. (min. legal value)"); /** Case A1:  [Time complexity = O(2), from 2 "+" operators] */
+      xPos = 1; /** Case A1:  [Time complexity = O(1), from 1 "=" operator] */
+    }
+    else if (x > 5000000) /** Case A2: [Time complexity = O(1), from ">" operator] */
+    {
+      System.out.println("Given x-value (x=" + x
+          + ") is outside the legal scope. Changing x to x=5000000. (max. legal value)"); /** Case A2:  [Time complexity = O(2), from 2 "+" operators] */
+      xPos = 5000000; /** Case A2:  [Time complexity = O(1), from 1 "=" operator] */
+    }
+    else
+    {
+      xPos = x; /** Case A3: [Time complexity = O(1), from "=" operator] */
     }
 
-    //Now we find the closest two players to the x position.
-    for (int i = 0; i < this.playerList.length; i++)
+
+    //First we check if the position was occupied with a player. If so, we kill the player:
+    if (this.balancedBinarySearchTree.contains(xPos)) /** Case B1: [Time complexity = O(log N), from "tree.contains(x)" method] */
     {
-      if(this.playerList[i] - x > 0)
+      //Player at position. Kill the player and return zero.
+      this.balancedBinarySearchTree.remove(xPos); /** Case B1: [Time complexity = O(log N), from "tree.remove(x)" method] */
+      distance = 0; /** Case B1: [Time complexity = O(1), from "=" operator] */
+    }
+    //If no player was at position, we find the closest player and calculate the return distance as well as moving the closest player to the ball location
+    else /** Case B2: */
+    {
+      //First we check if there exists a predecessor (value smaller than x) in the balanced tree:
+      if (this.balancedBinarySearchTree.floor(xPos) == null) /** Case B2A1: [Time complexity = O(log N) + O(1), from "tree.floor(x)" method and "==" operator] */
       {
-
+        //There is no smaller value in the tree. Thus, there can be no predecessor.
       }
-    }*/
+      else /** Case B2A2: */
+      {
+        //There is a predecessor. Lets save it.
+        try
+        {
+          xPosPredecessor = this.balancedBinarySearchTree.floor(xPos); /** Case B2A2: [Time complexity = O(1) + O(log N), from "=" operator and "tree.floor(x)" method] */
+        }
+        catch (NullPointerException error)
+        {
+          System.out.println("Error, read: " + error);  /** Case B2A2: [Time complexity = O(1), from "+" operator] */
+        }
+      }
 
-    // Implement your code here to update the line of players and return the distance
-    return distance;
+      //Then we check if there exists a successor (value larger than x) in the balanced tree:
+      if (this.balancedBinarySearchTree.ceiling(xPos) == null) /** Case B2B1: [Time complexity = O(log N) + O(1), from "tree.ceiling(x)" method and "==" operator] */
+      {
+        //There is no larger value in the tree. Thus, there can be no predecessor.
+      }
+      else /** Case B2B2: */
+      {
+        //There is a successor. Lets save it.
+        try
+        {
+          xPosSuccessor = this.balancedBinarySearchTree.ceiling(xPos); /** Case B2B2: [Time complexity = O(1) + O(log N), from "=" operator and "tree.ceiling(x)" method] */
+        }
+        catch (NullPointerException error)
+        {
+          System.out.println("Error, read: " + error); /** Case B2B2: [Time complexity = O(1), from "+" operator] */
+        }
+      }
+
+      //We now determine which player to move to the balls' location:
+      if (xPosPredecessor != -1 && xPosSuccessor != -1
+          && (xPos - xPosPredecessor) <= (xPosSuccessor - xPos)) /** Case B2C1: [Time complexity = O(7), from 2 uses of "!=" operators, 2 uses of "&&" operators, 2 uses of "-" operators and 1 use of "<=" operator] */
+      {
+        //There exists players to both the left and right of the given x-coordinate. And the player to the left (smaller x-value) is closest or same distance from the ball.
+        distance = xPos - xPosPredecessor; /** Case B2C1: [Time complexity = O(2), from 1 use of "=" operators, 1 uses of "-" operator] */
+
+        //Move the predecessor to the ball location:
+        this.balancedBinarySearchTree.remove(xPosPredecessor); /** Case B2C1: [Time complexity = O(log N), from "tree.remove(x)" method call */
+        this.balancedBinarySearchTree.add(xPos); /** Case B2C1: [Time complexity = O(log N), from "tree.add(x)" method call */
+      }
+      else if (xPosPredecessor != -1 && xPosSuccessor != -1) /** Case B2C2: [Time complexity = O(3), from 2 uses of "!=" operators and 1 use of "&&" operator] */
+      {
+        //There exists players to both the left and right of the given x-coordinate. And the player to the right (larger x-value) is closest or same distance from the ball.
+        distance = xPosSuccessor - xPos; /** Case B2C2: [Time complexity = O(2), from 1 use of "=" operator and 1 use of "-" operator] */
+
+        //Move the Successor to the ball location:
+        this.balancedBinarySearchTree.remove(xPosSuccessor); /** Case B2C2: [Time complexity = O(log N), from "tree.remove(x)" method call */
+        this.balancedBinarySearchTree.add(xPos); /** Case B2C2: [Time complexity = O(log N), from "tree.add(x)" method call */
+      }
+      else if (xPosPredecessor != -1) /** Case B2C3: [Time complexity = O(1), from 1 use of "!=" operators] */
+      {
+        //A successor does not exist, only a predecessor:
+        distance = xPos - xPosPredecessor; /** Case B2C3: [Time complexity = O(2), from 1 use of "=" operator and 1 use of "-" operator] */
+
+        //Move the predecessor to the ball location:
+        this.balancedBinarySearchTree.remove(xPosPredecessor); /** Case B2C3: [Time complexity = O(log N), from "tree.remove(x)" method call */
+        this.balancedBinarySearchTree.add(xPos); /** Case B2C3: [Time complexity = O(log N), from "tree.add(x)" method call */
+      }
+      else if (xPosSuccessor != -1) /** Case B2C4: [Time complexity = O(1), from 1 use of "!=" operators] */
+      {
+        //There doesn't exist a predecessor, only a successor:
+        distance = xPosSuccessor - xPos; /** Case B2C4: [Time complexity = O(2), from 1 use of "=" operator and 1 use of "-" operator] */
+
+        //Move the successor to the ball location:
+        this.balancedBinarySearchTree.remove(xPosSuccessor); /** Case B2C4: [Time complexity = O(log N), from "tree.remove(x)" method call */
+        this.balancedBinarySearchTree.add(xPos); /** Case B2C4: [Time complexity = O(log N), from "tree.add(x)" method call */
+      }
+      else /** Case B2C5: */
+      {
+        System.out.println("ERROR: Unknown error occurred.");
+        //To provide ability to catch negative return values as error-ridden.
+        distance = -1; /** Case B2C5: [Time complexity = O(1), from 1 use of "=" operator] */
+      }
+    }
+    return distance; /** Base Case: [Time complexity = O(1), from 1 use of "return" operator] */
   }
+
+  /** Time complexity Analysis of the .throwBall() method:
+   * As documented in the above code, we can extract these time complexities from each line of the code:
+   * Line 134: Base Case: T(N) = O(1)
+   * Line 135: Base Case: T(N) = O(1)
+   * Line 140: Case A1: T(N) = O(1)
+   * Line 143: Case A1: T(N) = O(2)
+   * Line 144: Case A1: T(N) = O(1)
+   * Line 146: Case A2: T(N) = O(1)
+   * Line 149: Case A2: T(N) = O(2)
+   * Line 150: Case A2: T(N) = O(1)
+   * Line 154: Case A3: T(N) = O(1)
+   * Line 159: Case B1: T(N) = O(log N)
+   * Line 162: Case B1: T(N) = O(log N)
+   * Line 163: Case B1: T(N) = O(1)
+   * Line 169: Case B2A1: T(N) = O(log N) + O(1)
+   * Line 178: Case B2A2: T(N) = O(1) + O(log N)
+   * Line 182: Case B2A2: T(N) = O(1)
+   * Line 187: Case B2B1: T(N) = O(log N) + O(1)
+   * Line 196: Case B2B2: T(N) = O(1) + O(log N)
+   * Line 200: Case B2B2: T(N) = O(1)
+   * Line 206: Case B2C1: T(N) = O(7)
+   * Line 209: Case B2C1: T(N) = O(2)
+   * Line 212: Case B2C1: T(N) = O(log N)
+   * Line 213: Case B2C1: T(N) = O(log N)
+   * Line 215: Case B2C2: T(N) = O(3)
+   * Line 218: Case B2C2: T(N) = O(2)
+   * Line 221: Case B2C2: T(N) = O(log N)
+   * Line 222: Case B2C2: T(N) = O(log N)
+   * Line 224: Case B2C3: T(N) = O(1)
+   * Line 227: Case B2C3: T(N) = O(2)
+   * Line 230: Case B2C3: T(N) = O(log N)
+   * Line 231: Case B2C3: T(N) = O(log N)
+   * Line 233: Case B2C4: T(N) = O(1)
+   * Line 236: Case B2C4: T(N) = O(2)
+   * Line 239: Case B2C4: T(N) = O(log N)
+   * Line 240: Case B2C4: T(N) = O(log N)
+   * Line 246: Case B2C5: T(N) = O(1)
+   * Line 249: Base Case: [Time complexity = O(1)
+
+   * We can compact these further, such that:
+   * Line 134+135+249     : Base Case : T(N) = O(1) + O(1) + O(1) = O(3)
+   * Line 140+143+144     : Case A1   : T(N) = O(1) + O(2) + O(1) = O(4)
+   * Line 146+149+150     : Case A2   : T(N) = O(1) + O(2) + O(1) = O(4)
+   * Line 154             : Case A3   : T(N) = O(1)
+   * Line 159+162+163     : Case B1   : T(N) = O(Log N) + O(Log N) + O(1) = 2*O(Log N) + O(1)
+   * Line 169             : Case B2A1 : T(N) = O(Log N) + O(1)
+   * Line 178+182         : Case B2A2 : T(N) = O(1) + O(Log N) + O(1) = O(2) + O(Log N)
+   * Line 187             : Case B2B1 : T(N) = O(Log N) + O(1)
+   * Line 196+200         : Case B2B2 : T(N) = O(1) + O(Log N) + O(1) = O(2) + O(Log N)
+   * Line 206+209+212+213 : Case B2C1 : T(N) = O(7) + O(2) + O(Log N) + O(Log N) = O(9) + 2*O(Log N)
+   * Line 215+218+221+222 : Case B2C2 : T(N) = O(3) + O(2) + O(Log N) + O(Log N) = O(5) + 2*O(Log N)
+   * Line 224+227+230+231 : Case B2C3 : T(N) = O(1) + O(2) + O(Log N) + O(Log N) = O(3) + 2*O(Log N)
+   * Line 233+236+237+240 : Case B2C4 : T(N) = O(1) + O(2) + O(Log N) + O(Log N) = O(3) + 2*O(Log N)
+   * Line 246             : Case B2C5 : T(N) = O(1)
+
+   * In order to determine the time complexity during the worst-case scenario, we evaluate each section of the method.
+   * Since the given if-statements cannot be both true and false at the same time, we know that only of the the following cases is executed:
+   * Base Case + (either A1, A2, A3) + (either B1 or (B2 and (either B2A1 or B2A2) and (either B2B1 or B2B2) and (either B2C1 or B2C2 or B2C3 or B2C4 or B2C5)
+
+   * From the above, we now evaluate each term of the combined time complexity expression, isolating each term with the worst time complexity (slowest execution, or most cpu clock cycles/operations)
+   * Base case is always executed. Remains T(N) = O(3)
+   * A1 and A2 are similar, and larger than A3. Thus second term is T(N) = O(4).
+   * In order to determine if B1 og B2 is most complex, we first evaluate the sub-terms in B2:
+   * B2A2 is larger than B2A1. Thus B2's first sub-term is T(N) = O(2) + O(Log N)
+   * B2B2 is larger than B2B1. Thus B2's second sub-term is T(N) = O(2) + O(Log N)
+   * B2C1 is larger than the rest of B2C*. Thus B2's third sub-term is: T(N) = O(9) + 2*O(Log N)
+   * From this we get that B2's T(N) is expressed as: O(2) + O(Log N) + O(2) + O(Log N) + O(9) + 2*O(Log N) = O(13) + 4*O(Log N)
+   * Since B2 is larger than B1, we choose B2.
+
+   * We can now express our methods' time complexity as a combination of these terms:
+   * Base Case + (either A1, A2) + (B2 and B2A2 and B2B2 and B2C1)
+
+   * Substituting the terms with each of their T(N) values we get:
+   * throwBall(), T(N) = O(3) + O(4) + O(13) + 4*O(Log N)
+   * throwBall(), T(N) = O(20) + 4*O(Log N)
+
+   * Since we must evaluate the worst-case performance, we can ignore constants.
+   * This leaves us with the time complexity for this method being in logarithmic time.
+   * throwBall(), T(N) = O(Log N).
+   * */
 }
+
+/** TIME COMPLEXITY SUMMATION:
+ * We have now determined the time complexity of both methods to be:
+ * addPlayer(), T(N) = O(6) + O(Log N). (Theta Time)
+ * addPlayer(), T(N) = O(Log N). (Omega Time)
+
+ * throwBall(), T(N) = O(20) + 4*O(Log N) (Theta Time)
+ * throwBall(), T(N) = O(Log N). (Omega Time)
+
+ * Finally, we can now evaluate the assignments limitation on number of operations, which was 500,000 operations.
+ * We do this by inserting N=5,000,000 into our Theta Time (which is the more exact of the two), for each method.
+
+ * Number of operations for addPlayer(), T(5,000,000):
+ * T(5,000,000) = 6 + Log(5,000,000) = 28.25 operations (rounded).
+
+ *  Number of operations for throwBall(), T(5,000,000):
+ *  T(5,000,000) = 20 + 4*Log(5,000,000) = 109.01 operations (rounded).
+
+ *  CONCLUSION:
+ *  Both implemented methods are very fast, significantly faster than the limitation of five hundred thousand operations pr. execution.
+ * */
